@@ -2,7 +2,7 @@
 
 ```
 make
-./pack (nix-build '<nixpkgs>' -A firefox) firefox.nar firefox.dep
+./pack $(nix-build '<nixpkgs>' -A firefox) firefox.nar firefox.dep
 ./unpack /tmp/store firefox.nar firefox.dep 
 ```
 
