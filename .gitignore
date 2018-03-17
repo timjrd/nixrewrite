@@ -1,0 +1,13 @@
+############## Editors
+*~
+\#*#
+.#*
+
+############## Builds
+result
+nixrewrite
+
+############## Garbage
+*.dep
+*.nar
+*.tar
