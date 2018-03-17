@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+
+err() {
+    echo $* >&2
+}
+
+if test $# -ne 3
+then
+    err "usage: $0 <package path> <output tarball file> <output dependencies file>"
+    exit 1
+fi
+
+package=$1
+outTarball=$2
+outDependencies=$3
+
+dependencies=$(nix-store -qR $package | xargs -L1 basename)
+
+# doesn't work with tar
+#tar -cf $outTarball -C /nix/store $dependencies
+
+closureDir=$(mktemp -d)
+(cd /nix/store && cp -r $dependencies $closureDir)
+nix-store --dump $closureDir > $outTarball
+chmod -R 777 $closureDir
+rm -rf $closureDir
+
+echo "$dependencies" > $outDependencies

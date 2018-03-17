@@ -1,0 +1,29 @@
+#!/usr/bin/env bash
+
+err() {
+    echo $* >&2
+}
+
+if test $# -ne 3
+then
+    err "usage: $0 <target path> <tarball file> <dependencies file>"
+    exit 1
+fi
+
+targetPath=$1
+tarball=$2
+dependencies=$3
+
+fromPrefix=/nix/store
+
+if test ${#targetPath} -gt ${#fromPrefix}
+then
+    err "error: the new prefix must have at most the same length as \"$fromPrefix\"."
+    exit 1
+fi
+
+# doesn't work with tar
+#mkdir -p $targetPath
+#./nixrewrite $fromPrefix $targetPath $dependencies < $tarball | tar -xC $targetPath
+
+./nixrewrite $fromPrefix $targetPath $dependencies < $tarball | nix-store --restore $targetPath
