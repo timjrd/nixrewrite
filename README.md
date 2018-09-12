@@ -1,3 +1,5 @@
+Prototype implementation of Nix store path rewriting as described in [this issue](https://github.com/NixOS/nix/issues/1971).
+
 # Example
 
 ```
