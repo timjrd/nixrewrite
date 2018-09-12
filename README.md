@@ -1,8 +1,10 @@
+Prototype implementation of Nix store path rewriting as described in [this issue](https://github.com/NixOS/nix/issues/1971).
+
 # Example
 
 ```
 make
-./pack (nix-build '<nixpkgs>' -A firefox) firefox.nar firefox.dep
+./pack $(nix-build '<nixpkgs>' -A firefox) firefox.nar firefox.dep
 ./unpack /tmp/store firefox.nar firefox.dep 
 ```
 
