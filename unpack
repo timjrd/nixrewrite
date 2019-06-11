@@ -4,17 +4,22 @@ err() {
     echo $* >&2
 }
 
+abs() {
+    echo "$(cd "$(dirname "$1")"; pwd)/$(basename "$1")"
+}
+
 if test $# -ne 3
 then
     err "usage: $0 <target path> <tarball file> <dependencies file>"
     exit 1
 fi
 
-targetPath=$1
-tarball=$2
-dependencies=$3
+targetPath=$(abs $1)
+tarball=$(abs $2)
+dependencies=$(abs $3)
 
 fromPrefix=/nix/store
+nixrewrite=$(pwd)/nixrewrite
 
 if test ${#targetPath} -gt ${#fromPrefix}
 then
@@ -22,8 +27,13 @@ then
     exit 1
 fi
 
-# doesn't work with tar
-#mkdir -p $targetPath
-#./nixrewrite $fromPrefix $targetPath $dependencies < $tarball | tar -xC $targetPath
+############ TAR (doesn't work)
+# mkdir -p $targetPath
+# ./nixrewrite $fromPrefix $targetPath $dependencies < $tarball | tar -xC $targetPath
 
-./nixrewrite $fromPrefix $targetPath $dependencies < $tarball | nix-store --restore $targetPath
+############ CPIO
+mkdir -p $targetPath
+(cd $targetPath && $nixrewrite $fromPrefix $targetPath $dependencies < $tarball | cpio -id)
+
+############ NAR
+# ./nixrewrite $fromPrefix $targetPath $dependencies < $tarball | nix-store --restore $targetPath

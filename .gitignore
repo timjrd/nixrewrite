@@ -11,3 +11,4 @@ nixrewrite
 *.dep
 *.nar
 *.tar
+*.cpio

@@ -4,25 +4,33 @@ err() {
     echo $* >&2
 }
 
+abs() {
+    echo "$(cd "$(dirname "$1")"; pwd)/$(basename "$1")"
+}
+
 if test $# -ne 3
 then
     err "usage: $0 <package path> <output tarball file> <output dependencies file>"
     exit 1
 fi
 
-package=$1
-outTarball=$2
-outDependencies=$3
+package=$(abs $1)
+outTarball=$(abs $2)
+outDependencies=$(abs $3)
 
 dependencies=$(nix-store -qR $package | xargs -L1 basename)
 
-# doesn't work with tar
-#tar -cf $outTarball -C /nix/store $dependencies
-
-closureDir=$(mktemp -d)
-(cd /nix/store && cp -r $dependencies $closureDir)
-nix-store --dump $closureDir > $outTarball
-chmod -R 777 $closureDir
-rm -rf $closureDir
-
 echo "$dependencies" > $outDependencies
+
+############ TAR (doesn't work)
+# tar -cf $outTarball -C /nix/store $dependencies
+
+############ CPIO
+(cd /nix/store && find $dependencies -depth -print | cpio -o > $outTarball)
+
+############ NAR
+# closureDir=$(mktemp -d)
+# (cd /nix/store && cp -r $dependencies $closureDir)
+# nix-store --dump $closureDir > $outTarball
+# chmod -R 777 $closureDir
+# rm -rf $closureDir
